@@ -1,14 +1,28 @@
 (function () {
 
-  var modC = (function () { return "C"; })();
+  var modD_sub2 = (function () {
+    return function(str) {
+      return str + "?";
+    };
+  })();
 
-  var modB = (function (c) {
-    return "B" + c;
-  })(modC);
+  var modD_sub1 = (function () {
+    return function(str) {
+      return str + "!";
+    };
+  })();
 
-  var modA = (function (c) {
-    return "A" + c;
-  })(modC);
+  var modC = (function (d1, d2) {
+    return d1("C") + d2("C");
+  })(modD_sub1, modD_sub2);
+
+  var modB = (function (c, d2) {
+    return d2("B") + c;
+  })(modC, modD_sub2);
+
+  var modA = (function (c, d1) {
+    return d1("A") + c;
+  })(modC, modD_sub1);
 
   (function (a, b) {
     console.log(a, b);

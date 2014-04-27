@@ -4,7 +4,8 @@ var parser = require("./module-parser");
 
 function build(loader, main) {
   var graph = new Graph(),
-      queue = new Deque();
+      queue = new Deque(),
+      visited = {};
 
   function addModuleToGraph(name) {
     var module = graph.nodes[name];
@@ -20,14 +21,16 @@ function build(loader, main) {
 
   queue.enqueue(main);
   while (queue.length > 0) {
-    var current = queue.dequeue(),
-        module = addModuleToGraph(current);
-
-    module.deps.forEach(function(dep) {
-      addModuleToGraph(dep);
-      graph.addEdge(current, dep);
-      queue.enqueue(dep);
-    });
+    var current = queue.dequeue();
+    if (!visited[current]) {
+      visited[current] = true;
+      var module = addModuleToGraph(current);
+      module.deps.forEach(function(dep) {
+        addModuleToGraph(dep);
+        graph.addEdge(current, dep);
+        queue.enqueue(dep);
+      });
+    }
   }
 
   return graph;

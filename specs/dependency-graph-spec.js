@@ -13,10 +13,13 @@ describe("dependency-graph", function() {
 
       var expectedAdj = {
         "main": ["modA", "modB"],
-        "modA": ["modC"],
-        "modB": ["modC"],
-        "modC": []
+        "modA": ["modC", "./modD/sub1"],
+        "modB": ["modC", "./modD/sub2"],
+        "modC": ["./modD/sub1", "./modD/sub2"],
+        "./modD/sub1": [],
+        "./modD/sub2": []
       };
+
       assert.deepEqual(expectedAdj, graph.adj);
     });
   });

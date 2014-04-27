@@ -24,8 +24,19 @@ describe("FilesystemLoader", function() {
     });
 
     it("shoult return file content if file exists", function() {
-      var expected = 'define(function() { return "C"; });';
-      assert.equal(expected, loader.load("modC.js"));
+      var expected = 'require(["modA", "modB"], function(a, b) {\n'
+                   + '  console.log(a, b);\n'
+                   + '});';
+      assert.equal(expected, loader.load("main.js"));
+    });
+
+    it("shoult support sub directories", function() {
+      var expected = 'define(function() {\n'
+                   + '  return function(str) {\n'
+                   + '    return str + "!";\n'
+                   + '  };\n'
+                   + '});';
+      assert.equal(expected, loader.load("modD/sub1.js"));
     });
 
   });
