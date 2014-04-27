@@ -1,4 +1,4 @@
-var parser = require("../src/module-parser");
+var define = require("../src/module-parser").type.define;
 var format = require("util").format;
 var indentationLevel = 2;
 
@@ -27,14 +27,23 @@ function convertToValidName(name) {
   return valid;
 }
 
-function compileModule(name, module) {
-  var parts = [], compiled;
+function compileModule(graph, name) {
+  var nodes = graph.nodes,
+      module = nodes[name],
+      parts = [],
+      factoryArgs,
+      compiled;
 
-  if (module.type === parser.type.define) {
+  function isDefine(dep) {
+    return nodes[dep].type === define;
+  }
+
+  if (module.type === define) {
     parts.push(format("var %s = ", convertToValidName(name)));
   }
   parts.push(format("(%s)", module.factory));
-  parts.push(format("(%s);", module.deps.map(convertToValidName).join(", ")));
+  factoryArgs = module.deps.filter(isDefine).map(convertToValidName);
+  parts.push(format("(%s);", factoryArgs.join(", ")));
 
   compiled = parts.join("");
 
@@ -45,13 +54,11 @@ function compile(graph) {
   var sorted = graph.topologicalSort(),
       nodes = graph.nodes,
       parts = [],
-      module,
       node;
 
   parts.push("(function () {");
   while (node = sorted.pop()) {
-    module = nodes[node];
-    parts.push(compileModule(node, module));
+    parts.push(compileModule(graph, node));
   }
   parts.push("})();");
 

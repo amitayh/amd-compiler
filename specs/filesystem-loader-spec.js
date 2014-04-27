@@ -30,7 +30,7 @@ describe("FilesystemLoader", function() {
       assert.equal(expected, loader.load("main.js"));
     });
 
-    it("shoult support sub directories", function() {
+    it("shoult support sub directories in path", function() {
       var expected = 'define(function() {\n'
                    + '  return function(str) {\n'
                    + '    return str + "!";\n'

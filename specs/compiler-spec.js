@@ -8,12 +8,20 @@ describe("compiler", function() {
 
   describe("#compile()", function() {
 
+    var root = path.resolve(__dirname, "fixtures"),
+        loader = new Loader(root);
+
     it("should merge all sources in dependency graph into a compiled source", function() {
-      var root = path.resolve(__dirname, "fixtures"),
-          loader = new Loader(root),
-          graph = dependencyGraph.build(loader, "main");
+      var graph = dependencyGraph.build(loader, "main");
 
       var expected = loader.load("compiled.js");
+      assert.equal(expected, compiler.compile(graph));
+    });
+
+    it("should allow require a require", function() {
+      var graph = dependencyGraph.build(loader, "main2");
+
+      var expected = loader.load("compiled2.js");
       assert.equal(expected, compiler.compile(graph));
     });
 
