@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "double-ended-queue": "~2.0"
+  }
+}
