@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+var path = require("path");
+var dependencyGraph = require("../src/dependency-graph");
+var FilesystemLoader = require("../src/filesystem-loader");
+var compiler = require("../src/compiler");
+
+var argv = process.argv.slice(2),
+    fullPath = path.resolve(process.cwd(), argv[0]),
+    root = path.dirname(fullPath),
+    main = path.basename(fullPath),
+    loader = new FilesystemLoader(root),
+    graph = dependencyGraph.build(loader, main);
+
+console.log(compiler.compile(graph));

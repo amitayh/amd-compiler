@@ -50,16 +50,6 @@ describe("Graph", function() {
     });
   });
 
-  describe("#containsNode()", function() {
-    it("should return false for missing node keys", function() {
-      assert.equal(false, graph.containsNode("1"));
-    });
-    it("should return true for existing node keys", function() {
-      graph.addNode("1", "node1");
-      assert.equal(true, graph.containsNode("1"));
-    });
-  });
-
   describe("#getIndegrees()", function() {
     it("should return nodes' in-degrees", function() {
       var expected;

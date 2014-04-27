@@ -17,13 +17,9 @@ Graph.prototype.addEdge = function(from, to) {
 };
 
 Graph.prototype.guardNode = function(key) {
-  if (!this.containsNode(key)) {
+  if (!this.nodes[key]) {
     throw new Error("Invalid node key - '" + key + "'");
   }
-};
-
-Graph.prototype.containsNode = function(key) {
-  return this.nodes[key] !== undefined;
 };
 
 Graph.prototype.getIndegrees = function() {
