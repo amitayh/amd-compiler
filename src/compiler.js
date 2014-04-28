@@ -1,5 +1,7 @@
 var define = require("../src/module-parser").type.define;
-var format = require("util").format;
+var util = require("util");
+var format = util.format;
+var inspect = util.inspect;
 var indentationLevel = 2;
 
 function stringRepeat(string, times) {
@@ -17,7 +19,7 @@ function indent(source, level) {
   return source.replace(/(^|\n)/g, replacement);
 }
 
-function convertToValidName(name) {
+function convertName(name) {
   var valid = name;
   // Trim bad characters from line begining
   valid = valid.replace(/^\W+/g, "");
@@ -31,37 +33,34 @@ function compileModule(graph, name) {
   var nodes = graph.nodes,
       module = nodes[name],
       factory = module.factory,
-      parts = [],
-      factoryArgs,
-      compiled;
+      compiled = "",
+      factoryArgs;
 
   function isDefine(dep) {
     return nodes[dep].type === define;
   }
 
   if (module.type === define) {
-    parts.push(format("var %s = ", convertToValidName(name)));
+    compiled += format("var %s = ", convertName(name));
   }
-  if (typeof factory === "function") {
-    factoryArgs = module.deps.filter(isDefine).map(convertToValidName);
-    parts.push(format("(%s)(%s);", factory, factoryArgs.join(", ")));
+  if (factory instanceof Function) {
+    factoryArgs = module.deps.filter(isDefine).map(convertName);
+    compiled += format("(%s)(%s);", factory, factoryArgs.join(", "));
   } else {
-    parts.push(format("%s;", JSON.stringify(factory)));
+    compiled += format("%s;", inspect(factory));
   }
-
-  compiled = parts.join("");
 
   return indent(compiled, indentationLevel);
 }
 
 function compile(graph) {
   var sorted = graph.topologicalSort(),
-      nodes = graph.nodes,
       parts = [],
       node;
 
   parts.push("(function () {");
-  while (node = sorted.pop()) {
+  while (sorted.length > 0) {
+    node = sorted.pop();
     parts.push(compileModule(graph, node));
   }
   parts.push("})();");

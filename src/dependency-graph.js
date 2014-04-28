@@ -5,32 +5,31 @@ var parser = require("./module-parser");
 function build(loader, main) {
   var graph = new Graph(),
       queue = new Deque(),
-      visited = {};
+      nodes = graph.nodes,
+      current;
 
   function addModuleToGraph(name) {
-    var module = graph.nodes[name];
-
-    if (!module) {
-      var source = loader.load(name + ".js");
+    var source, module;
+    if (!nodes[name]) {
+      source = loader.load(name + ".js");
       module = parser.parseSource(source);
       graph.addNode(name, module);
     }
+  }
 
-    return module;
+  function handleDep(dep) {
+    if (!nodes[dep]) {
+      addModuleToGraph(dep);
+      queue.enqueue(dep);
+    }
+    graph.addEdge(current, dep);
   }
 
   queue.enqueue(main);
   while (queue.length > 0) {
-    var current = queue.dequeue();
-    if (!visited[current]) {
-      visited[current] = true;
-      var module = addModuleToGraph(current);
-      module.deps.forEach(function(dep) {
-        addModuleToGraph(dep);
-        graph.addEdge(current, dep);
-        queue.enqueue(dep);
-      });
-    }
+    current = queue.dequeue();
+    addModuleToGraph(current);
+    nodes[current].deps.forEach(handleDep);
   }
 
   return graph;
