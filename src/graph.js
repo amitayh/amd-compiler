@@ -6,6 +6,9 @@ function Graph() {
 }
 
 Graph.prototype.addNode = function(key, node) {
+  if (this.nodes[key]) {
+    throw new Error("Key already exists - '" + key + "'");
+  }
   this.nodes[key] = node;
   this.adj[key] = [];
 };

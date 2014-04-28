@@ -12,4 +12,4 @@ var argv = process.argv.slice(2),
     loader = new FilesystemLoader(root),
     graph = dependencyGraph.build(loader, main);
 
-console.log(compiler.compile(graph));
+process.stdout.write(compiler.compile(graph));

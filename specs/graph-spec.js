@@ -27,6 +27,13 @@ describe("Graph", function() {
       assert.deepEqual(expectedNodes, graph.nodes);
       assert.deepEqual(expectedAdj, graph.adj);
     });
+
+    it("should throw an exception if key already exists", function() {
+      graph.addNode("1", "node1");
+      assert.throws(function() {
+        graph.addNode("1", "node2");
+      });
+    });
   });
 
   describe("#addEdge()", function() {
