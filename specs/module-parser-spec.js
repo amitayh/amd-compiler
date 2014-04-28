@@ -20,7 +20,7 @@ describe("module-parser", function() {
         var factory = 'function () { return "foo"; }';
         assert.equal(parser.type.define, module.type);
         assert.deepEqual([], module.deps);
-        assert.equal(factory, module.factory);
+        assert.equal(factory, module.factory.toString());
       });
 
       it("should parse modules with dependencies", function() {
@@ -30,7 +30,7 @@ describe("module-parser", function() {
         var factory = 'function (a, b) { return a + b + "c"; }';
         assert.equal(parser.type.define, module.type);
         assert.deepEqual(["modA", "modB"], module.deps);
-        assert.equal(factory, module.factory);
+        assert.equal(factory, module.factory.toString());
       });
 
     });
@@ -44,7 +44,7 @@ describe("module-parser", function() {
         var factory = 'function (foo) { console.log(foo, "bar"); }';
         assert.equal(parser.type.require, module.type);
         assert.deepEqual(["foo"], module.deps);
-        assert.equal(factory, module.factory);
+        assert.equal(factory, module.factory.toString());
       });
 
     });

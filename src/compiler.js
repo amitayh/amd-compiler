@@ -30,6 +30,7 @@ function convertToValidName(name) {
 function compileModule(graph, name) {
   var nodes = graph.nodes,
       module = nodes[name],
+      factory = module.factory,
       parts = [],
       factoryArgs,
       compiled;
@@ -41,9 +42,12 @@ function compileModule(graph, name) {
   if (module.type === define) {
     parts.push(format("var %s = ", convertToValidName(name)));
   }
-  parts.push(format("(%s)", module.factory));
-  factoryArgs = module.deps.filter(isDefine).map(convertToValidName);
-  parts.push(format("(%s);", factoryArgs.join(", ")));
+  if (typeof factory === "function") {
+    factoryArgs = module.deps.filter(isDefine).map(convertToValidName);
+    parts.push(format("(%s)(%s);", factory, factoryArgs.join(", ")));
+  } else {
+    parts.push(format("%s;", JSON.stringify(factory)));
+  }
 
   compiled = parts.join("");
 

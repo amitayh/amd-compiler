@@ -8,7 +8,7 @@ function createAmdFunction(module, type) {
     }
     module.type = type;
     module.deps = deps;
-    module.factory = factory.toString();
+    module.factory = factory;
   };
 }
 

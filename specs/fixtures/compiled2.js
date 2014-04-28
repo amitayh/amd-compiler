@@ -4,9 +4,7 @@
     console.log("req");
   })();
 
-  var def = (function () {
-    return "def";
-  })();
+  var def = "def";
 
   (function (def) {
     console.log(def);
