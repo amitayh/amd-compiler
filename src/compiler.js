@@ -29,6 +29,25 @@ function convertName(name) {
   return valid;
 }
 
+function getFactoryArgs(nodes, deps) {
+  var factoryArgs = [],
+      hasRequire = false;
+
+  deps.forEach(function(dep) {
+    if (nodes[dep].type === define) {
+      if (hasRequire) {
+        throw new Error("Invalid dependencies order - all 'requires' must be last");
+      } else {
+        factoryArgs.push(convertName(dep));
+      }
+    } else {
+      hasRequire = true;
+    }
+  });
+
+  return factoryArgs;
+}
+
 function compileModule(graph, name) {
   var nodes = graph.nodes,
       module = nodes[name],
@@ -36,15 +55,11 @@ function compileModule(graph, name) {
       compiled = "",
       factoryArgs;
 
-  function isDefine(dep) {
-    return nodes[dep].type === define;
-  }
-
   if (module.type === define) {
     compiled += format("var %s = ", convertName(name));
   }
   if (factory instanceof Function) {
-    factoryArgs = module.deps.filter(isDefine).map(convertName);
+    factoryArgs = getFactoryArgs(nodes, module.deps);
     compiled += format("(%s)(%s);", factory, factoryArgs.join(", "));
   } else {
     compiled += format("%s;", inspect(factory));
