@@ -2,6 +2,9 @@ var type = {define: 1, require: 2};
 
 function createAmdFunction(module, type) {
   return function(deps, factory) {
+    if (module.type !== undefined) {
+      throw new Error("Ambiguous module type");
+    }
     if (factory === undefined) {
       factory = deps;
       deps = [];
@@ -18,6 +21,10 @@ function parseSource(source) {
       require = createAmdFunction(module, type.require);
 
   eval(source);
+
+  if (module.type === undefined) {
+    throw new Error("Invalid module - must call require() or define()");
+  }
 
   return module;
 }

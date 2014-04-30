@@ -49,6 +49,23 @@ describe("module-parser", function() {
 
     });
 
+    it("should throw an exception if a module contains both a 'require' and a 'define' decleration", function() {
+      source = 'require(function() { console.log("bar"); });\n'
+             + 'define({foo: "bar"});';
+
+      assert.throws(function() {
+        parser.parseSource(source);
+      });
+    });
+
+    it("should throw an exception if module doesn't define or require anything", function() {
+      source = '{foo: "bar"};';
+
+      assert.throws(function() {
+        parser.parseSource(source);
+      });
+    });
+
   });
 
 });
