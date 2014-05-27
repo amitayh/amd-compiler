@@ -35,10 +35,14 @@ Graph.prototype.getIndegrees = function() {
   }
 
   for (key in adj) {
-    indegree[key] = 0;
+    if (adj.hasOwnProperty(key)) {
+      indegree[key] = 0;
+    }
   }
   for (key in adj) {
-    adj[key].forEach(increaseInDegree);
+    if (adj.hasOwnProperty(key)) {
+      adj[key].forEach(increaseInDegree);
+    }
   }
 
   return indegree;
@@ -59,8 +63,10 @@ Graph.prototype.topologicalSort = function() {
 
   // Find roots
   for (key in adj) {
-    if (indegree[key] === 0) {
-      queue.enqueue(key);
+    if (adj.hasOwnProperty(key)) {
+      if (indegree[key] === 0) {
+        queue.enqueue(key);
+      }
     }
   }
 
@@ -73,8 +79,10 @@ Graph.prototype.topologicalSort = function() {
 
   // Search for circles
   for (key in adj) {
-    if (indegree[key] !== 0) {
-      throw new Error("Circle found - topological sort is not possible");
+    if (adj.hasOwnProperty(key)) {
+      if (indegree[key] !== 0) {
+        throw new Error("Circle found - topological sort is not possible");
+      }
     }
   }
 

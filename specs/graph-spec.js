@@ -22,8 +22,8 @@ describe("Graph", function() {
     it("should add node with empty adjacencies list", function() {
       graph.addNode("1", "node1");
 
-      var expectedNodes = {1: "node1"};
-      var expectedAdj = {1: []};
+      var expectedNodes = {"1": "node1"};
+      var expectedAdj = {"1": []};
       assert.deepEqual(expectedNodes, graph.nodes);
       assert.deepEqual(expectedAdj, graph.adj);
     });
