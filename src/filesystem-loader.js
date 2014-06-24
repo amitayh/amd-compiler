@@ -2,7 +2,7 @@ var fs = require("fs");
 var path = require("path");
 
 function fileExists(file) {
-  return fs.statSync(file).isFile();
+  return fs.existsSync(file);
 }
 
 function getContent(file) {
