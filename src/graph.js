@@ -52,7 +52,7 @@ Graph.prototype.topologicalSort = function() {
   var adj = this.adj,
       indegree = this.getIndegrees(),
       queue = new Deque(),
-      sorted = [],
+      sorted = new Deque(),
       key;
 
   function handleAdj(adj) {
@@ -73,7 +73,7 @@ Graph.prototype.topologicalSort = function() {
   // Main loop
   while (queue.length > 0) {
     key = queue.dequeue();
-    sorted.push(key);
+    sorted.unshift(key);
     adj[key].forEach(handleAdj);
   }
 
@@ -86,7 +86,7 @@ Graph.prototype.topologicalSort = function() {
     }
   }
 
-  return sorted;
+  return sorted.toArray();
 };
 
 module.exports = Graph;

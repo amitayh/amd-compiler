@@ -87,7 +87,7 @@ describe("Graph", function() {
       graph.addEdge("2", "4");
       graph.addEdge("4", "3");
 
-      var expected = ["1", "2", "4", "3"];
+      var expected = ["3", "4", "2", "1"];
       assert.deepEqual(expected, graph.topologicalSort());
     });
     it("should throw an exception if a circle is found", function() {

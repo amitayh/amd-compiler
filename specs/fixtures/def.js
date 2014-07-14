@@ -1,1 +1,1 @@
-define("def");
+define({name: "def"});

@@ -2,8 +2,8 @@
   (function () {
     console.log("req");
   }());
-  var def = "def";
+  var def = { name: "def" };
   (function (def) {
     console.log(def);
-  }(def));
+  }(def, req));
 }());

@@ -9,100 +9,87 @@ function convertName(name) {
   var valid = name;
   // Trim bad characters from line begining
   valid = valid.replace(/^\W+/g, "");
-  // Convert other bad characters to underscored
+  // Convert other bad characters to underscores
   valid = valid.replace(/\W+/g, "_");
 
   return valid;
 }
 
-function getFactoryArgs(nodes, deps) {
-  var factoryArgs = [],
-      hasRequire = false;
-
-  deps.forEach(function(dep) {
-    if (nodes[dep].type === define) {
-      if (hasRequire) {
-        throw new Error("Invalid dependencies order - all 'requires' must be last");
-      } else {
-        factoryArgs.push({
-          type: "Identifier",
-          name: convertName(dep)
-        });
-      }
-    } else {
-      hasRequire = true;
-    }
-  });
-
-  return factoryArgs;
+function createIdentifier(name) {
+  return {
+    type: "Identifier",
+    name: convertName(name)
+  };
 }
 
-function compileModule(graph, name) {
-  var nodes = graph.nodes,
-      module = nodes[name],
-      factory = module.factory,
-      expression,
-      statement;
+function createCallExpression(callee, args) {
+  return {
+    type: "CallExpression",
+    callee: callee,
+    arguments: args || []
+  };
+}
 
+function createExpressionStatement(expression) {
+  return {
+    type: "ExpressionStatement",
+    expression: expression
+  };
+}
+
+function getModuleInit(module) {
+  var factory = module.factory, args, init;
   if (factory.type == "FunctionExpression") {
-    expression = {
-      type: "CallExpression",
-      callee: factory,
-      arguments: getFactoryArgs(nodes, module.deps)
-    };
+    args = module.deps.map(createIdentifier);
+    init = createCallExpression(factory, args);
   } else {
-    expression = factory;
+    init = factory;
   }
 
-  if (module.type === define) {
-    statement = {
-      type: "VariableDeclaration",
-      declarations: [{
-        type: "VariableDeclarator",
-        id: {
-          type: "Identifier",
-          name: convertName(name)
-        },
-        init: expression
-      }],
-      kind: "var"
-    };
-  } else {
-    statement = {
-      type: "ExpressionStatement",
-      expression: expression
-    };
-  }
+  return init;
+}
 
-  return statement;
+function createBodyExpression(nodes) {
+  return function(name) {
+    var module = nodes[name],
+        init = getModuleInit(module),
+        expression;
+
+    if (module.type === define) {
+      expression = {
+        type: "VariableDeclaration",
+        declarations: [{
+          type: "VariableDeclarator",
+          id: createIdentifier(name),
+          init: init
+        }],
+        kind: "var"
+      };
+    } else {
+      expression = createExpressionStatement(init);
+    }
+
+    return expression;
+  };
 }
 
 function compile(graph) {
   var sorted = graph.topologicalSort(),
+      mapper = createBodyExpression(graph.nodes),
       options = {format: format},
-      body = [],
+      expression,
       ast;
 
-  while (sorted.length > 0) {
-    node = sorted.pop();
-    body.push(compileModule(graph, node));
-  }
-
-  ast = {
-    type: "ExpressionStatement",
-    expression: {
-      type: "CallExpression",
-      callee: {
-        type: "FunctionExpression",
-        params: [],
-        body: {
-          type: "BlockStatement",
-          body: body
-        }
-      },
-      arguments: []
+  expression = createCallExpression({
+    type: "FunctionExpression",
+    params: [],
+    body: {
+      type: "BlockStatement",
+      body: sorted.map(mapper)
     }
-  };
+  });
+
+  ast = createExpressionStatement(expression);
 
   return escodegen.generate(ast, options);
 }
