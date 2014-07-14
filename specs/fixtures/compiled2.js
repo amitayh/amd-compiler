@@ -1,13 +1,9 @@
 (function () {
-
   (function () {
     console.log("req");
-  })();
-
-  var def = 'def';
-
+  }());
+  var def = "def";
   (function (def) {
     console.log(def);
-  })(def);
-
-})();
+  }(def));
+}());

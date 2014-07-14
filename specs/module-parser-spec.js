@@ -64,7 +64,7 @@ describe("module-parser", function() {
     });
 
     it("should throw an exception if module doesn't define or require anything", function() {
-      source = '{foo: "bar"};';
+      source = 'foo();';
 
       assert.throws(function() {
         parser.parseSource(source);

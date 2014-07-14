@@ -1,23 +1,9 @@
+var escodegen = require("escodegen");
 var define = require("../src/module-parser").type.define;
-var util = require("util");
-var format = util.format;
-var inspect = util.inspect;
-var indentationLevel = 2;
-
-function stringRepeat(string, times) {
-  var result = "";
-  for (var i = 0; i < times; i++) {
-    result += string;
-  }
-
-  return result;
-}
-
-function indent(source, level) {
-  var replacement = "$1" + stringRepeat(" ", level);
-  
-  return source.replace(/(^|\n)/g, replacement);
-}
+var format = {
+  indent: {style: "  "},
+  quotes: "double"
+};
 
 function convertName(name) {
   var valid = name;
@@ -38,7 +24,10 @@ function getFactoryArgs(nodes, deps) {
       if (hasRequire) {
         throw new Error("Invalid dependencies order - all 'requires' must be last");
       } else {
-        factoryArgs.push(convertName(dep));
+        factoryArgs.push({
+          type: "Identifier",
+          name: convertName(dep)
+        });
       }
     } else {
       hasRequire = true;
@@ -52,35 +41,70 @@ function compileModule(graph, name) {
   var nodes = graph.nodes,
       module = nodes[name],
       factory = module.factory,
-      compiled = "",
-      factoryArgs;
+      expression,
+      statement;
+
+  if (factory.type == "FunctionExpression") {
+    expression = {
+      type: "CallExpression",
+      callee: factory,
+      arguments: getFactoryArgs(nodes, module.deps)
+    };
+  } else {
+    expression = factory;
+  }
 
   if (module.type === define) {
-    compiled += format("var %s = ", convertName(name));
-  }
-  if (factory instanceof Function) {
-    factoryArgs = getFactoryArgs(nodes, module.deps);
-    compiled += format("(%s)(%s);", factory, factoryArgs.join(", "));
+    statement = {
+      type: "VariableDeclaration",
+      declarations: [{
+        type: "VariableDeclarator",
+        id: {
+          type: "Identifier",
+          name: convertName(name)
+        },
+        init: expression
+      }],
+      kind: "var"
+    };
   } else {
-    compiled += format("%s;", inspect(factory));
+    statement = {
+      type: "ExpressionStatement",
+      expression: expression
+    };
   }
 
-  return indent(compiled, indentationLevel);
+  return statement;
 }
 
 function compile(graph) {
   var sorted = graph.topologicalSort(),
-      parts = [],
-      node;
+      options = {format: format},
+      body = [],
+      ast;
 
-  parts.push("(function () {");
   while (sorted.length > 0) {
     node = sorted.pop();
-    parts.push(compileModule(graph, node));
+    body.push(compileModule(graph, node));
   }
-  parts.push("})();");
 
-  return parts.join("\n\n");
+  ast = {
+    type: "ExpressionStatement",
+    expression: {
+      type: "CallExpression",
+      callee: {
+        type: "FunctionExpression",
+        params: [],
+        body: {
+          type: "BlockStatement",
+          body: body
+        }
+      },
+      arguments: []
+    }
+  };
+
+  return escodegen.generate(ast, options);
 }
 
 module.exports.compile = compile;
