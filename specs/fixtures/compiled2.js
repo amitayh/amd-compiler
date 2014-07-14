@@ -5,5 +5,5 @@
   var def = { name: "def" };
   (function (def) {
     console.log(def);
-  }(def, req));
+  }(def));
 }());

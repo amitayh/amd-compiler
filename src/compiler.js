@@ -37,25 +37,27 @@ function createExpressionStatement(expression) {
   };
 }
 
-function getModuleInit(module) {
-  var factory = module.factory, args, init;
-  if (factory.type == "FunctionExpression") {
-    args = module.deps.map(createIdentifier);
-    init = createCallExpression(factory, args);
-  } else {
-    init = factory;
-  }
-
-  return init;
+function createTypeFilter(nodes, type) {
+  return function(name) {
+    return nodes[name].type === type;
+  };
 }
 
 function createBodyExpression(nodes) {
   return function(name) {
     var module = nodes[name],
-        init = getModuleInit(module),
-        expression;
+        factory = module.factory,
+        isDefine = createTypeFilter(nodes, define),
+        args, init, expression;
 
-    if (module.type === define) {
+    if (factory.type == "FunctionExpression") {
+      args = module.deps.filter(isDefine).map(createIdentifier);
+      init = createCallExpression(factory, args);
+    } else {
+      init = factory;
+    }
+
+    if (isDefine(name)) {
       expression = {
         type: "VariableDeclaration",
         declarations: [{
