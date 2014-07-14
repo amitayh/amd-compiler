@@ -1,3 +1,4 @@
+var esprima = require("esprima");
 var assert = require("assert");
 var parser = require("../src/module-parser");
 
@@ -6,6 +7,10 @@ describe("module-parser", function() {
   describe("#parseSource()", function() {
 
     var source, module;
+
+    function parseFactory(factory) {
+      return esprima.parse("(" + factory + ")").body[0].expression;
+    }
 
     afterEach(function() {
       source = module = null;
@@ -17,20 +22,20 @@ describe("module-parser", function() {
         source = 'define(function() { return "foo"; });';
         module = parser.parseSource(source);
 
-        var factory = 'function () { return "foo"; }';
+        var factory = parseFactory('function () { return "foo"; }');
         assert.equal(parser.type.define, module.type);
         assert.deepEqual([], module.deps);
-        assert.equal(factory, module.factory.toString());
+        assert.deepEqual(factory, module.factory);
       });
 
       it("should parse modules with dependencies", function() {
         source = 'define(["modA", "modB"], function(a, b) { return a + b + "c"; });';
         module = parser.parseSource(source);
 
-        var factory = 'function (a, b) { return a + b + "c"; }';
+        var factory = parseFactory('function (a, b) { return a + b + "c"; }');
         assert.equal(parser.type.define, module.type);
         assert.deepEqual(["modA", "modB"], module.deps);
-        assert.equal(factory, module.factory.toString());
+        assert.deepEqual(factory, module.factory);
       });
 
     });
@@ -41,10 +46,10 @@ describe("module-parser", function() {
         source = 'require(["foo"], function(foo) { console.log(foo, "bar"); });';
         module = parser.parseSource(source);
 
-        var factory = 'function (foo) { console.log(foo, "bar"); }';
+        var factory = parseFactory('function (foo) { console.log(foo, "bar"); }');
         assert.equal(parser.type.require, module.type);
         assert.deepEqual(["foo"], module.deps);
-        assert.equal(factory, module.factory.toString());
+        assert.deepEqual(factory, module.factory);
       });
 
     });
