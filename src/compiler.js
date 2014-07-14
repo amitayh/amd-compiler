@@ -37,18 +37,18 @@ function createExpressionStatement(expression) {
   };
 }
 
-function createTypeFilter(nodes, type) {
-  return function(name) {
-    return nodes[name].type === type;
-  };
-}
+function compile(graph) {
+  var nodes = graph.nodes,
+      sorted, mainCall, options, ast;
 
-function createBodyExpression(nodes) {
-  return function(name) {
+  function isDefine(name) {
+    return nodes[name].type === define;
+  }
+
+  function getModuleInit(name) {
     var module = nodes[name],
         factory = module.factory,
-        isDefine = createTypeFilter(nodes, define),
-        args, init, expression;
+        args, init;
 
     if (factory.type == "FunctionExpression") {
       args = module.deps.filter(isDefine).map(createIdentifier);
@@ -56,6 +56,13 @@ function createBodyExpression(nodes) {
     } else {
       init = factory;
     }
+
+    return init;
+  }
+
+  function mapper(name) {
+    var init = getModuleInit(name),
+        expression;
 
     if (isDefine(name)) {
       expression = {
@@ -72,17 +79,10 @@ function createBodyExpression(nodes) {
     }
 
     return expression;
-  };
-}
+  }
 
-function compile(graph) {
-  var sorted = graph.topologicalSort(),
-      mapper = createBodyExpression(graph.nodes),
-      options = {format: format},
-      expression,
-      ast;
-
-  expression = createCallExpression({
+  sorted = graph.topologicalSort();
+  mainCall = createCallExpression({
     type: "FunctionExpression",
     params: [],
     body: {
@@ -90,8 +90,8 @@ function compile(graph) {
       body: sorted.map(mapper)
     }
   });
-
-  ast = createExpressionStatement(expression);
+  ast = createExpressionStatement(mainCall);
+  options = {format: format};
 
   return escodegen.generate(ast, options);
 }
