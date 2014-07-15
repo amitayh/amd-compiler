@@ -1,5 +1,4 @@
 var esprima = require("esprima");
-
 var type = {define: 1, require: 2};
 
 function getModuleType(name) {
@@ -14,32 +13,37 @@ function getValue(element) {
 }
 
 function getModuleDeps(args) {
+  var deps = [];
   if (args[0].type == "ArrayExpression") {
-    return args[0].elements.map(getValue);
-  } else {
-    return [];
+    deps = args[0].elements.map(getValue);
   }
+
+  return deps;
 }
 
 function getModuleFactory(args) {
-  if (args[0].type == "ArrayExpression") {
-    return args[1];
-  } else {
-    return args[0];
+  var factory = args[0];
+  if (factory.type == "ArrayExpression") {
+    factory = args[1];
   }
+
+  return factory;
 }
 
 function parseSource(source) {
   var program = esprima.parse(source),
-      body = program.body;
+      body = program.body,
+      callExpression,
+      calleeName,
+      args;
 
   if (body.length != 1) {
     throw new Error("Ambiguous module type");
   }
 
-  var call = body[0].expression,
-      calleeName = call.callee.name,
-      args = call.arguments;
+  callExpression = body[0].expression;
+  calleeName = callExpression.callee.name;
+  args = callExpression.arguments;
 
   return {
     type: getModuleType(calleeName),

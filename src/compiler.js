@@ -1,18 +1,14 @@
 var escodegen = require("escodegen");
-var define = require("../src/module-parser").type.define;
+var parser = require("../src/module-parser");
 var format = {
   indent: {style: "  "},
   quotes: "double"
 };
 
 function convertName(name) {
-  var valid = name;
-  // Trim bad characters from line begining
-  valid = valid.replace(/^\W+/g, "");
-  // Convert other bad characters to underscores
-  valid = valid.replace(/\W+/g, "_");
-
-  return valid;
+  return name
+    .replace(/^\W+/g, "")   // Trim bad characters from line begining
+    .replace(/\W+/g, "_");  // Convert other bad characters to underscores
 }
 
 function createIdentifier(name) {
@@ -39,6 +35,7 @@ function createExpressionStatement(expression) {
 
 function compile(graph) {
   var nodes = graph.nodes,
+      define = parser.type.define,
       sorted, mainCall, options, ast;
 
   function isDefine(name) {
@@ -60,7 +57,7 @@ function compile(graph) {
     return init;
   }
 
-  function mapper(name) {
+  function moduleToExpressionMapper(name) {
     var init = getModuleInit(name),
         expression;
 
@@ -87,7 +84,7 @@ function compile(graph) {
     params: [],
     body: {
       type: "BlockStatement",
-      body: sorted.map(mapper)
+      body: sorted.map(moduleToExpressionMapper)
     }
   });
   ast = createExpressionStatement(mainCall);

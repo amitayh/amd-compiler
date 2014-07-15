@@ -39,6 +39,20 @@ describe("FilesystemLoader", function() {
       assert.equal(expected, loader.load("modD/sub1.js"));
     });
 
+    it("should support multiple paths", function() {
+      var path1 = path.resolve(root, "modD"), path2 = root,
+          loader = new Loader(path1, path2),
+          expected;
+
+      expected = 'require(function() {\n'
+               + '  console.log("Hello World");\n'
+               + '});';
+      assert.equal(expected, loader.load("main.js"));
+
+      expected = 'define({name: "def"});';
+      assert.equal(expected, loader.load("def.js"));
+    });
+
   });
 
 });

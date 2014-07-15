@@ -10,6 +10,7 @@ var argv = process.argv.slice(2),
     root = path.dirname(fullPath),
     main = path.basename(fullPath),
     loader = new FilesystemLoader(root),
-    graph = dependencyGraph.build(loader, main);
+    graph = dependencyGraph.build(loader, main),
+    compiled = compiler.compile(graph);
 
-process.stdout.write(compiler.compile(graph));
+process.stdout.write(compiled);
