@@ -15,6 +15,41 @@ describe("FilesystemLoader", function() {
     loader = null;
   });
 
+  describe("#resolve()", function() {
+
+    it("should return 'undefined' if file is not resolved", function() {
+      assert.equal(undefined, loader.resolve("foo.js"));
+    });
+
+    it("should resolve relative paths", function() {
+      var base = path.resolve(root, "modD");
+      var expected = path.resolve(root, "main.js");
+      assert.equal(expected, loader.resolve("../main.js", base));
+    });
+
+    it("should resolve absolute paths", function() {
+      var expected = path.resolve(root, "main.js");
+      assert.equal(expected, loader.resolve(expected));
+    });
+
+    it("should resolve full file path", function() {
+      var expected = path.resolve(root, "main.js");
+      assert.equal(expected, loader.resolve("main.js"));
+    });
+
+    it("should search multiple paths", function() {
+      var firstPath = path.resolve(root, "modD"), expected;
+      loader = new Loader([firstPath, root]);
+
+      expected = path.resolve(firstPath, "main.js");
+      assert.equal(expected, loader.resolve("main.js"));
+
+      expected = path.resolve(root, "def.js");
+      assert.equal(expected, loader.resolve("def.js"));
+    });
+
+  });
+
   describe("#load()", function() {
 
     it("should throw an exception if a file is not found", function() {
@@ -23,34 +58,13 @@ describe("FilesystemLoader", function() {
       });
     });
 
-    it("shoult return file content if file exists", function() {
+    it("shoult return file content if exists", function() {
+      var file = loader.resolve("main.js");
+
       var expected = 'require(["modA", "modB"], function(a, b) {\n'
                    + '  console.log(a, b);\n'
                    + '});';
-      assert.equal(expected, loader.load("main.js"));
-    });
-
-    it("shoult support sub directories in path", function() {
-      var expected = 'define(function() {\n'
-                   + '  return function(str) {\n'
-                   + '    return str + "!";\n'
-                   + '  };\n'
-                   + '});';
-      assert.equal(expected, loader.load("modD/sub1.js"));
-    });
-
-    it("should support multiple paths", function() {
-      var path1 = path.resolve(root, "modD"), path2 = root,
-          loader = new Loader(path1, path2),
-          expected;
-
-      expected = 'require(function() {\n'
-               + '  console.log("Hello World");\n'
-               + '});';
-      assert.equal(expected, loader.load("main.js"));
-
-      expected = 'define({name: "def"});';
-      assert.equal(expected, loader.load("def.js"));
+      assert.equal(expected, loader.load(file));
     });
 
   });

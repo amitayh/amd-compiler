@@ -9,12 +9,14 @@ function getContent(file) {
   return fs.readFileSync(file).toString();
 }
 
-function FilesystemLoader() {
-  this.paths = Array.prototype.slice.call(arguments);
+function FilesystemLoader(paths) {
+  this.paths = Array.isArray(paths) ? paths : [paths];
 }
 
-FilesystemLoader.prototype.find = function(file) {
+FilesystemLoader.prototype.resolve = function(file, base) {
   var paths = this.paths, fullPath;
+
+  file = path.join(base || "", file);
   for (var i = 0, l = paths.length, current; i < l && !fullPath; i++) {
     current = path.resolve(paths[i], file);
     if (fileExists(current)) {
@@ -26,12 +28,11 @@ FilesystemLoader.prototype.find = function(file) {
 };
 
 FilesystemLoader.prototype.load = function(file) {
-  var fullPath = this.find(file);
-  if (!fileExists(fullPath)) {
+  if (!fileExists(file)) {
     throw new Error("File '" + file + "' was not found");
   }
   
-  return getContent(fullPath);
+  return getContent(file);
 };
 
 module.exports = FilesystemLoader;
