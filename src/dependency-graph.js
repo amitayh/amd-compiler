@@ -7,7 +7,8 @@ function build(loader, main) {
   var graph = new Graph(),
       queue = new Deque(),
       nodes = graph.nodes,
-      current;
+      current,
+      mod;
 
   function resolve(name) {
     var base = current ? path.dirname(current) : null;
@@ -15,16 +16,17 @@ function build(loader, main) {
   }
 
   function addModuleToGraph(name) {
-    var source, module;
-    if (!nodes[name]) {
+    var module = nodes[name], source;
+    if (!module) {
       source = loader.load(name);
       module = parser.parseSource(source);
       graph.addNode(name, module);
     }
+
+    return module;
   }
 
   function handleDep(dep) {
-    dep = resolve(dep);
     if (!nodes[dep]) {
       addModuleToGraph(dep);
       queue.enqueue(dep);
@@ -36,8 +38,9 @@ function build(loader, main) {
   queue.enqueue(main);
   while (queue.length > 0) {
     current = queue.dequeue();
-    addModuleToGraph(current);
-    nodes[current].deps.forEach(handleDep);
+    mod = addModuleToGraph(current);
+    mod.resolvedDeps = mod.deps.map(resolve);
+    mod.resolvedDeps.forEach(handleDep);
   }
 
   return graph;

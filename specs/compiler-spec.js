@@ -3,7 +3,6 @@ var path = require("path");
 var dependencyGraph = require("../src/dependency-graph");
 var Loader = require("../src/filesystem-loader");
 var compiler = require("../src/compiler");
-var LoaderStub = require("./stubs/loader");
 
 describe("compiler", function() {
 
@@ -15,14 +14,14 @@ describe("compiler", function() {
     it("should merge all sources in dependency graph into a compiled source", function() {
       var graph = dependencyGraph.build(loader, "main");
 
-      var expected = loader.load("compiled.js");
+      var expected = loader.load(path.resolve(root, "compiled.js"));
       assert.equal(expected, compiler.compile(graph));
     });
 
     it("should allow require a require", function() {
       var graph = dependencyGraph.build(loader, "main2");
 
-      var expected = loader.load("compiled2.js");
+      var expected = loader.load(path.resolve(root, "compiled2.js"));
       assert.equal(expected, compiler.compile(graph));
     });
 
