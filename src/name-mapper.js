@@ -50,13 +50,17 @@ function findPath(mappingTree, parts) {
   return treePath;
 }
 
+function getName(treePath) {
+  return treePath.join("_").replace(/\.js$/, "");
+}
+
 function create(list) {
   var mappingTree = createMappingTree(list);
 
   return function(name) {
     var treePath = findPath(mappingTree, split(name));
 
-    return treePath.length ? treePath.join("_") : null;
+    return treePath.length ? getName(treePath) : null;
   }
 }
 

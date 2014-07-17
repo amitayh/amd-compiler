@@ -1,39 +1,11 @@
 var path = require("path");
 var escodegen = require("escodegen");
+var nameMapper = require("../src/name-mapper");
 var parser = require("../src/module-parser");
 var format = {
   indent: {style: "  "},
   quotes: "double"
 };
-
-function contains(obj, value) {
-  for (var key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      if (obj[key] === value) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-function createNameMapper() {
-  var map = {};
-  return function(name) {
-    var identifier = map[name], parts;
-    if (!identifier) {
-      parts = name.replace(/\.js$/, "").split(path.sep);
-      identifier = parts.pop();
-      while (contains(map, identifier)) {
-        identifier = parts.pop() + "_" + identifier;
-      }
-      map[name] = identifier;
-    }
-
-    return identifier;
-  };
-}
 
 function createCallExpression(callee, args) {
   return {
@@ -59,11 +31,11 @@ function compile(graph) {
     return nodes[name].type === define;
   }
 
-  var nameMapper = createNameMapper();
+  var mapper = nameMapper.create(Object.keys(nodes));
   function createIdentifier(name) {
     return {
       type: "Identifier",
-      name: nameMapper(name)
+      name: mapper(name)
     };
   }
 
