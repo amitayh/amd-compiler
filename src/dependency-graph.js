@@ -10,8 +10,12 @@ function build(loader, main) {
       current,
       mod;
 
+  function isRelative(name) {
+    return /^\.{1,2}\//.test(name);
+  }
+
   function resolve(name) {
-    var base = current ? path.dirname(current) : null;
+    var base = isRelative(name) ? path.dirname(current) : null;
     return loader.resolve(name + ".js", base);
   }
 
