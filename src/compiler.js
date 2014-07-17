@@ -72,6 +72,11 @@ function compile(graph) {
       expression = createExpressionStatement(init);
     }
 
+    expression.leadingComments = [{
+      type: "Line",
+      value: " Source: " + name
+    }];
+
     return expression;
   }
 
@@ -85,7 +90,10 @@ function compile(graph) {
     }
   });
   ast = createExpressionStatement(mainCall);
-  options = {format: format};
+  options = {
+    format: format,
+    comment: true
+  };
 
   return escodegen.generate(ast, options);
 }

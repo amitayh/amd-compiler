@@ -11,17 +11,22 @@ describe("compiler", function() {
     var root = path.resolve(__dirname, "fixtures"),
         loader = new Loader(root);
 
-    it("should merge all sources in dependency graph into a compiled source", function() {
-      var graph = dependencyGraph.build(loader, "main");
+    function getSource(name) {
+      var file = path.resolve(root, name + ".js");
+      return loader.load(file).replace(/ROOT/g, root);
+    }
 
-      var expected = loader.load(path.resolve(root, "compiled.js"));
+    it("should merge all sources in dependency graph into a compiled source", function() {
+      var graph = dependencyGraph.build(loader, "main"),
+          expected = getSource("compiled");
+
       assert.equal(expected, compiler.compile(graph));
     });
 
     it("should allow require a require", function() {
-      var graph = dependencyGraph.build(loader, "main2");
+      var graph = dependencyGraph.build(loader, "main2"),
+          expected = getSource("compiled2");
 
-      var expected = loader.load(path.resolve(root, "compiled2.js"));
       assert.equal(expected, compiler.compile(graph));
     });
 
