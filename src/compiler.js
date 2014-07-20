@@ -1,4 +1,3 @@
-var path = require("path");
 var escodegen = require("escodegen");
 var nameMapper = require("../src/name-mapper");
 var parser = require("../src/module-parser");
@@ -25,13 +24,13 @@ function createExpressionStatement(expression) {
 function compile(graph) {
   var nodes = graph.nodes,
       define = parser.type.define,
+      mapper = nameMapper.create(Object.keys(nodes)),
       sorted, mainCall, options, ast;
 
   function isDefine(name) {
     return nodes[name].type === define;
   }
 
-  var mapper = nameMapper.create(Object.keys(nodes));
   function createIdentifier(name) {
     return {
       type: "Identifier",
@@ -56,7 +55,8 @@ function compile(graph) {
 
   function moduleToExpressionMapper(name) {
     var init = getModuleInit(name),
-        expression;
+        expression,
+        comment;
 
     if (isDefine(name)) {
       expression = {
@@ -72,10 +72,8 @@ function compile(graph) {
       expression = createExpressionStatement(init);
     }
 
-    expression.leadingComments = [{
-      type: "Line",
-      value: " Source: " + name
-    }];
+    comment = {type: "Line", value: " Source: " + name};
+    expression.leadingComments = [comment];
 
     return expression;
   }

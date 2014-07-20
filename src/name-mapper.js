@@ -1,8 +1,7 @@
 var path = require("path");
-
-function split(name) {
-  return name.split(path.sep);
-}
+var delimiter = path.sep;
+var glue = "_";
+var suffix = /\.js$/;
 
 function addToTree(tree, parts) {
   var head = parts.pop(),
@@ -27,7 +26,7 @@ function addToTree(tree, parts) {
 function createMappingTree(list) {
   var mappingTree = {};
   list.forEach(function(name) {
-    addToTree(mappingTree, split(name));
+    addToTree(mappingTree, name.split(delimiter));
   });
 
   return mappingTree;
@@ -50,17 +49,13 @@ function findPath(mappingTree, parts) {
   return treePath;
 }
 
-function getName(treePath) {
-  return treePath.join("_").replace(/\.js$/, "");
-}
-
 function create(list) {
   var mappingTree = createMappingTree(list);
 
   return function(name) {
-    var treePath = findPath(mappingTree, split(name));
+    var treePath = findPath(mappingTree, name.split(delimiter));
 
-    return treePath.length ? getName(treePath) : null;
+    return treePath.join(glue).replace(suffix, "");
   }
 }
 

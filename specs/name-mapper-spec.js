@@ -14,7 +14,7 @@ describe("name-mapper", function() {
       ];
 
       var mapper = nameMapper.create(names);
-      assert.equal(null, mapper("fake.js"));
+      assert.equal("", mapper("fake.js"));
       assert.equal("mod1", mapper("foo/bar/baz/mod1.js"));
       assert.equal("mod2", mapper("foo/bar/baz/mod2.js"));
       assert.equal("sub1_main", mapper("foo/bar/baz/sub1/main.js"));

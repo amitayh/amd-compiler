@@ -3,16 +3,16 @@ var Deque = require("double-ended-queue");
 var Graph = require("./graph");
 var parser = require("./module-parser");
 
+function isRelative(name) {
+  return /^\.{1,2}\//.test(name);
+}
+
 function build(loader, main) {
   var graph = new Graph(),
       queue = new Deque(),
       nodes = graph.nodes,
       current,
       mod;
-
-  function isRelative(name) {
-    return /^\.{1,2}\//.test(name);
-  }
 
   function resolve(name) {
     var base = isRelative(name) ? path.dirname(current) : null;
@@ -38,8 +38,7 @@ function build(loader, main) {
     graph.addEdge(current, dep);
   }
 
-  main = resolve(main);
-  queue.enqueue(main);
+  queue.enqueue(resolve(main));
   while (queue.length > 0) {
     current = queue.dequeue();
     mod = addModuleToGraph(current);

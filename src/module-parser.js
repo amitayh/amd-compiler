@@ -5,6 +5,7 @@ function getModuleType(name) {
   if (type[name] === undefined) {
     throw new Error("Invalid module - must call require() or define()");
   }
+
   return type[name];
 }
 
