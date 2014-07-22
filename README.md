@@ -25,8 +25,8 @@ Say the given modules are defined in the path `/foo/bar`:
 
 ```js
 // modA.js
-define(["modC"], function(c) {
-  return c("C");
+define(["modB", "modC"], function(b, c) {
+  return b + c("A");
 });
 ```
 
@@ -74,9 +74,9 @@ Will generate the following output:
       return c("B");
     }(modC);
   // Source: /foo/bar/modA.js
-  var modA = function (c) {
-      return c("C");
-    }(modC);
+  var modA = function (b, c) {
+      return b + c("A");
+    }(modB, modC);
   // Source: /foo/bar/main.js
   (function (a, b) {
     console.log(a, b);
