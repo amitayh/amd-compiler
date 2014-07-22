@@ -97,3 +97,7 @@ Run tests:
 ```
 $ mocha specs/
 ```
+
+## Internals
+
+*TODO*
