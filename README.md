@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/amitayh/amd-compiler.svg?branch=master)](https://travis-ci.org/amitayh/amd-compiler)
+
 # amd-compiler (cool name required)
 
 Compiles JS source written as AMD modules to a single file without the need for a loader (RequireJS / almond / etc.)
