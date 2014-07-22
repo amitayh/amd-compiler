@@ -101,7 +101,7 @@ $ mocha specs/
 ## Internals
 
 1. Dependency graph is resolved, using [esprima](http://esprima.org/) for parsing the JS sources:<br>
-   ![Dependency graph](doc/deps.svg)
+   ![Dependency graph](doc/deps.png)
 2. Graph is topologically sorted, making sure that the dependencies are in the correct order:<br>
-   ![Dependencies in topological order](doc/sorted.svg)
+   ![Dependencies in topological order](doc/sorted.png)
 3. Using [escodegen](https://github.com/Constellation/escodegen), the compiler constructs a single source from all needed dependencies
