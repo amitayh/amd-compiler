@@ -10,6 +10,10 @@
     }
   },
   "devDependencies": {
+    "mocha": "~1.18",
     "blanket": "~1.1"
+  },
+  "scripts": {
+    "test": "mocha -R tap ./specs"
   }
 }
