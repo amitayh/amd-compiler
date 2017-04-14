@@ -86,7 +86,7 @@ Will generate the following output:
 
 ## Running tests
 
-Install [mocha](http://visionmedia.github.io/mocha/):
+Install [mocha](http://mochajs.org/):
 
 ```
 $ npm install -g mocha
