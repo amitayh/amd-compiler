@@ -1,4 +1,4 @@
-# amd-compiler [![Build Status](https://travis-ci.org/amitayh/amd-compiler.svg?branch=master)](https://travis-ci.org/amitayh/amd-compiler)
+# amd-compiler [![Build Status](https://travis-ci.org/amitayh/amd-compiler.svg?branch=master)](https://travis-ci.org/amitayh/amd-compiler) [![codecov](https://codecov.io/gh/amitayh/amd-compiler/branch/master/graph/badge.svg)](https://codecov.io/gh/amitayh/amd-compiler)
 
 Compiles JS source written as AMD modules to a single file without the need for a loader (RequireJS / almond / etc.)
 
